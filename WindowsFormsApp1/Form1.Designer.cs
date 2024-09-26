@@ -33,6 +33,10 @@
             this.labelPath2 = new System.Windows.Forms.Label();
             this.btnFolder2 = new System.Windows.Forms.Button();
             this.SelectFolder1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.btnPrintFiles = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.Debug_mode = new System.Windows.Forms.CheckBox();
+            this.ProgrammName = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnFolder1
@@ -79,11 +83,57 @@
             // 
             this.SelectFolder1.HelpRequest += new System.EventHandler(this.folderBrowserDialog1_HelpRequest);
             // 
+            // btnPrintFiles
+            // 
+            this.btnPrintFiles.Location = new System.Drawing.Point(360, 171);
+            this.btnPrintFiles.Name = "btnPrintFiles";
+            this.btnPrintFiles.Size = new System.Drawing.Size(177, 69);
+            this.btnPrintFiles.TabIndex = 4;
+            this.btnPrintFiles.Text = "print filenames";
+            this.btnPrintFiles.UseVisualStyleBackColor = true;
+            this.btnPrintFiles.Click += new System.EventHandler(this.btnPrintFiles_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(626, 29);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(237, 20);
+            this.checkBox1.TabIndex = 5;
+            this.checkBox1.Text = "Put all duplicates in separate folder";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // Debug_mode
+            // 
+            this.Debug_mode.AutoSize = true;
+            this.Debug_mode.Location = new System.Drawing.Point(626, 55);
+            this.Debug_mode.Name = "Debug_mode";
+            this.Debug_mode.Size = new System.Drawing.Size(108, 20);
+            this.Debug_mode.TabIndex = 6;
+            this.Debug_mode.Text = "Debug mode";
+            this.Debug_mode.UseVisualStyleBackColor = true;
+            this.Debug_mode.CheckedChanged += new System.EventHandler(this.Debug_mode_CheckedChanged);
+            // 
+            // ProgrammName
+            // 
+            this.ProgrammName.AutoSize = true;
+            this.ProgrammName.Font = new System.Drawing.Font("Times New Roman", 15F);
+            this.ProgrammName.Location = new System.Drawing.Point(330, 20);
+            this.ProgrammName.Name = "ProgrammName";
+            this.ProgrammName.Size = new System.Drawing.Size(223, 29);
+            this.ProgrammName.TabIndex = 7;
+            this.ProgrammName.Text = "Search for dublicates";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(874, 487);
+            this.Controls.Add(this.ProgrammName);
+            this.Controls.Add(this.Debug_mode);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.btnPrintFiles);
             this.Controls.Add(this.labelPath2);
             this.Controls.Add(this.btnFolder2);
             this.Controls.Add(this.labelPath1);
@@ -102,6 +152,10 @@
         private System.Windows.Forms.Label labelPath2;
         private System.Windows.Forms.Button btnFolder2;
         private System.Windows.Forms.FolderBrowserDialog SelectFolder1;
+        private System.Windows.Forms.Button btnPrintFiles;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox Debug_mode;
+        private System.Windows.Forms.Label ProgrammName;
     }
 }
 
