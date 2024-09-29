@@ -11,6 +11,7 @@ namespace WindowsFormsApp1
     {
         String path1 = "";
         String path2 = "";
+        String dublicatesPath = "";
         List<string> allFilesPaths = new List<string>();  // List to hold all file paths
         List<byte[]> allHashes = new List<byte[]>(); // List to hold all byte[] hashes
         List<List<string>> identicalFiles = new List<List<string>>(); // List to hold groups of similar files
@@ -57,13 +58,43 @@ namespace WindowsFormsApp1
         // Event handler for button click to process the files and find identical ones
         private void btnPrintFiles_Click(object sender, EventArgs e)
         {
+            if(dublicatesPath == "")
+            {
+                // If no path for dublicates selected 
+                MessageBox.Show($"Please select folder where to put dublicates!",
+                    "No path for dublicates",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            if(path1 == "")
+            {
+                // If no folder selected 
+                MessageBox.Show($"Please select folder from where to take files!",
+                    "No selected folder",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+            }
+            if(!Debug_mode.Checked)
+            {
+                DialogResult ConfirmationResult = MessageBox.Show($"This will move all identical files without any further conformations. If you are not sure that you want to move files, use debug mode first.",
+                    "Are you sure you want to move files?",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Question);
+                if(ConfirmationResult == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
             // Clear previous data
             allFilesPaths.Clear();
             allHashes.Clear();
             identicalFiles.Clear();
 
             // Call the recursive DFS function starting from path1 and path2
+            debugText.Text = "Hashing 1st folder files...";
             GetFilesDFS(path1);
+            debugText.Text = "Hashing 2nd folder files...";
             GetFilesDFS(path2);
 
             // Compare all hashes and group identical files
@@ -79,7 +110,14 @@ namespace WindowsFormsApp1
                     foreach (var file in group)
                     {
                         Console.WriteLine(file);
-                        MoveIdenticalFiles(file);
+                        if(Debug_mode.Checked)
+                        {
+                            debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                        }
+                        else
+                        {
+                            MoveIdenticalFiles(file);
+                        }
                     }
                     Console.WriteLine();
                 }
@@ -92,11 +130,22 @@ namespace WindowsFormsApp1
                     foreach (var file in group)
                     {
                         Console.WriteLine(file);
-                        if (file == group[0])
+                        if (Debug_mode.Checked)
                         {
-                            continue;
+                            if (file == group[0])
+                            {
+                                continue;
+                            }
+                            debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
                         }
-                        MoveIdenticalFiles(file);
+                        else
+                        {
+                            if (file == group[0])
+                            {
+                                continue;
+                            }
+                            MoveIdenticalFiles(file);
+                        }
                     }
                     Console.WriteLine();
                 }
@@ -182,7 +231,7 @@ namespace WindowsFormsApp1
                 string fileName = Path.GetFileName(oldPath);
 
                 // Construct the new file path
-                string newPath = Path.Combine(@"C:\Users\kiril\OneDrive\Рабочий стол\identical files", fileName);
+                string newPath = Path.Combine(dublicatesPath, fileName);
 
                 // Check if the file already exists at the new location
                 if (File.Exists(newPath))
@@ -232,6 +281,22 @@ namespace WindowsFormsApp1
         private void Debug_mode_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void DublicatesPath_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                folderBrowserDialog.Description = "Select a folder";
+
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    LabelDublicatesPath.Text = folderBrowserDialog.SelectedPath;
+                    dublicatesPath = folderBrowserDialog.SelectedPath;
+                }
+            }
         }
     }
 }
