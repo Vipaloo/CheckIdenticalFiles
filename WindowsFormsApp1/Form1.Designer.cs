@@ -34,7 +34,7 @@
             this.btnFolder2 = new System.Windows.Forms.Button();
             this.SelectFolder1 = new System.Windows.Forms.FolderBrowserDialog();
             this.btnPrintFiles = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.chkboxMoveAllDublicates = new System.Windows.Forms.CheckBox();
             this.Debug_mode = new System.Windows.Forms.CheckBox();
             this.ProgrammName = new System.Windows.Forms.Label();
             this.debugText = new System.Windows.Forms.Label();
@@ -96,16 +96,16 @@
             this.btnPrintFiles.UseVisualStyleBackColor = true;
             this.btnPrintFiles.Click += new System.EventHandler(this.btnPrintFiles_Click);
             // 
-            // checkBox1
+            // chkboxMoveAllDublicates
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(626, 29);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(321, 20);
-            this.checkBox1.TabIndex = 5;
-            this.checkBox1.Text = "Put all files that have duplicates in separate folder";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.chkboxMoveAllDublicates.AutoSize = true;
+            this.chkboxMoveAllDublicates.Location = new System.Drawing.Point(626, 29);
+            this.chkboxMoveAllDublicates.Name = "chkboxMoveAllDublicates";
+            this.chkboxMoveAllDublicates.Size = new System.Drawing.Size(321, 20);
+            this.chkboxMoveAllDublicates.TabIndex = 5;
+            this.chkboxMoveAllDublicates.Text = "Put all files that have duplicates in separate folder";
+            this.chkboxMoveAllDublicates.UseVisualStyleBackColor = true;
+            this.chkboxMoveAllDublicates.CheckedChanged += new System.EventHandler(this.chkbxMoveAllDublicates_CheckedChanged);
             // 
             // Debug_mode
             // 
@@ -166,7 +166,7 @@
             this.Controls.Add(this.debugText);
             this.Controls.Add(this.ProgrammName);
             this.Controls.Add(this.Debug_mode);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.chkboxMoveAllDublicates);
             this.Controls.Add(this.btnPrintFiles);
             this.Controls.Add(this.labelPath2);
             this.Controls.Add(this.btnFolder2);
@@ -187,7 +187,7 @@
         private System.Windows.Forms.Button btnFolder2;
         private System.Windows.Forms.FolderBrowserDialog SelectFolder1;
         private System.Windows.Forms.Button btnPrintFiles;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox chkboxMoveAllDublicates;
         private System.Windows.Forms.CheckBox Debug_mode;
         private System.Windows.Forms.Label ProgrammName;
         private System.Windows.Forms.Label debugText;

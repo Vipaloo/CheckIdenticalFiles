@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
@@ -56,100 +58,117 @@ namespace WindowsFormsApp1
         }
 
         // Event handler for button click to process the files and find identical ones
-        private void btnPrintFiles_Click(object sender, EventArgs e)
+        // Main function
+        private async void btnPrintFiles_Click(object sender, EventArgs e)
         {
-            if(dublicatesPath == "")
-            {
-                // If no path for dublicates selected 
-                MessageBox.Show($"Please select folder where to put dublicates!",
-                    "No path for dublicates",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-            }
-            if(path1 == "")
+            if (path1 == "" && path2 == "")
             {
                 // If no folder selected 
                 MessageBox.Show($"Please select folder from where to take files!",
                     "No selected folder",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-
+                return;
             }
-            if(!Debug_mode.Checked)
+            if (dublicatesPath == "")
+            {
+                // If no path for dublicates selected 
+                MessageBox.Show($"Please select folder where to put dublicates!",
+                    "No path for dublicates",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+            if (!Debug_mode.Checked)
             {
                 DialogResult ConfirmationResult = MessageBox.Show($"This will move all identical files without any further conformations. If you are not sure that you want to move files, use debug mode first.",
                     "Are you sure you want to move files?",
                     MessageBoxButtons.OKCancel,
                     MessageBoxIcon.Question);
-                if(ConfirmationResult == DialogResult.Cancel)
+                if (ConfirmationResult == DialogResult.Cancel)
                 {
                     return;
                 }
             }
+            // Update the debug text immediately
+            debugText.Text = "Working on it...";
+
             // Clear previous data
             allFilesPaths.Clear();
             allHashes.Clear();
             identicalFiles.Clear();
 
-            // Call the recursive DFS function starting from path1 and path2
-            debugText.Text = "Hashing 1st folder files...";
-            GetFilesDFS(path1);
-            debugText.Text = "Hashing 2nd folder files...";
-            GetFilesDFS(path2);
+            // Run file processing in a background task
+            await Task.Run(() =>
+            {
+                // Call the recursive DFS function starting from path1 and path2
+                if(path1 != "")
+                {
+                    GetFilesDFS(path1);
+                }
+                if(path2 != "")
+                {
+                    GetFilesDFS(path2);
+                }
+                // Compare all hashes and group identical files
+                CompareAndGroupHashes();
 
-            // Compare all hashes and group identical files
-            CompareAndGroupHashes();
-            
-            // Display the results in the console
-            Console.WriteLine("Groups of identical files:");
-            if (checkBox1.Checked)
-            {
-                foreach (var group in identicalFiles)
+                // Display the results in the console
+                Console.WriteLine("Groups of identical files:");
+                if (chkboxMoveAllDublicates.Checked)
                 {
-                    Console.WriteLine("Identical files:");
-                    foreach (var file in group)
+                    foreach (var group in identicalFiles)
                     {
-                        Console.WriteLine(file);
-                        if(Debug_mode.Checked)
+                        Console.WriteLine("Identical files:");
+                        foreach (var file in group)
                         {
-                            debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                            Console.WriteLine(file);
+                            if (Debug_mode.Checked)
+                            {
+                                debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                            }
+                            else
+                            {
+                                MoveIdenticalFiles(file);
+                                debugText.Text = "Done!";
+                            }
                         }
-                        else
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    foreach (var group in identicalFiles)
+                    {
+                        foreach (var file in group)
                         {
-                            MoveIdenticalFiles(file);
+                            if (Debug_mode.Checked)
+                            {
+                                // Safely update debugText using Invoke to marshal the call to the UI thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    if (file != group[0])
+                                    {
+                                        debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                                    }
+                                }));
+                            }
+                            else
+                            {
+                                if (file == group[0])
+                                {
+                                    continue;
+                                }
+                                MoveIdenticalFiles(file);
+                                this.Invoke(new Action(() =>
+                                {
+                                    debugText.Text = "Done!";
+                                }));
+                            }
                         }
                     }
-                    Console.WriteLine();
                 }
-            }
-            else
-            {
-                foreach (var group in identicalFiles)
-                {
-                    Console.WriteLine("Identical files:");
-                    foreach (var file in group)
-                    {
-                        Console.WriteLine(file);
-                        if (Debug_mode.Checked)
-                        {
-                            if (file == group[0])
-                            {
-                                continue;
-                            }
-                            debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
-                        }
-                        else
-                        {
-                            if (file == group[0])
-                            {
-                                continue;
-                            }
-                            MoveIdenticalFiles(file);
-                        }
-                    }
-                    Console.WriteLine();
-                }
-            }
+            });
         }
 
         // DFS method to recursively get files in directories and subdirectories
@@ -265,7 +284,7 @@ namespace WindowsFormsApp1
 
         private void labelPath2_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void folderBrowserDialog1_HelpRequest(object sender, EventArgs e)
@@ -273,7 +292,7 @@ namespace WindowsFormsApp1
             MessageBox.Show("This is the folder browser dialog help.");
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void chkbxMoveAllDublicates_CheckedChanged(object sender, EventArgs e)
         {
 
         }
