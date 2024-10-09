@@ -28,18 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnFolder1 = new System.Windows.Forms.Button();
             this.labelPath1 = new System.Windows.Forms.Label();
             this.labelPath2 = new System.Windows.Forms.Label();
             this.btnFolder2 = new System.Windows.Forms.Button();
             this.SelectFolder1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.btnPrintFiles = new System.Windows.Forms.Button();
+            this.btnMoveFiles = new System.Windows.Forms.Button();
             this.chkboxMoveAllDublicates = new System.Windows.Forms.CheckBox();
             this.Debug_mode = new System.Windows.Forms.CheckBox();
             this.ProgrammName = new System.Windows.Forms.Label();
-            this.debugText = new System.Windows.Forms.Label();
             this.DublicatesPath = new System.Windows.Forms.Button();
             this.LabelDublicatesPath = new System.Windows.Forms.Label();
+            this.debugText = new System.Windows.Forms.TextBox();
+            this.btnClearPath1 = new System.Windows.Forms.Button();
+            this.btnClearPath2 = new System.Windows.Forms.Button();
+            this.Version = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnFolder1
@@ -48,28 +52,28 @@
             this.btnFolder1.Name = "btnFolder1";
             this.btnFolder1.Size = new System.Drawing.Size(116, 45);
             this.btnFolder1.TabIndex = 0;
-            this.btnFolder1.Text = "select folder 1";
+            this.btnFolder1.Text = "Select folder 1";
             this.btnFolder1.UseVisualStyleBackColor = true;
             this.btnFolder1.Click += new System.EventHandler(this.btnFolder1_Click);
             // 
             // labelPath1
             // 
             this.labelPath1.AutoSize = true;
-            this.labelPath1.Location = new System.Drawing.Point(61, 105);
+            this.labelPath1.Location = new System.Drawing.Point(52, 105);
             this.labelPath1.Name = "labelPath1";
-            this.labelPath1.Size = new System.Drawing.Size(80, 16);
+            this.labelPath1.Size = new System.Drawing.Size(105, 16);
             this.labelPath1.TabIndex = 1;
-            this.labelPath1.Text = "folder 1 path";
+            this.labelPath1.Text = "Select 1st folder!";
             this.labelPath1.Click += new System.EventHandler(this.labelHelloWorld_Click);
             // 
             // labelPath2
             // 
             this.labelPath2.AutoSize = true;
-            this.labelPath2.Location = new System.Drawing.Point(61, 247);
+            this.labelPath2.Location = new System.Drawing.Point(52, 242);
             this.labelPath2.Name = "labelPath2";
-            this.labelPath2.Size = new System.Drawing.Size(80, 16);
+            this.labelPath2.Size = new System.Drawing.Size(110, 16);
             this.labelPath2.TabIndex = 3;
-            this.labelPath2.Text = "folder 2 path";
+            this.labelPath2.Text = "Select 2nd folder!";
             this.labelPath2.Click += new System.EventHandler(this.labelPath2_Click);
             // 
             // btnFolder2
@@ -78,7 +82,7 @@
             this.btnFolder2.Name = "btnFolder2";
             this.btnFolder2.Size = new System.Drawing.Size(116, 45);
             this.btnFolder2.TabIndex = 2;
-            this.btnFolder2.Text = "select folder 2";
+            this.btnFolder2.Text = "Select folder 2";
             this.btnFolder2.UseVisualStyleBackColor = true;
             this.btnFolder2.Click += new System.EventHandler(this.btnFolder2_Click);
             // 
@@ -86,20 +90,22 @@
             // 
             this.SelectFolder1.HelpRequest += new System.EventHandler(this.folderBrowserDialog1_HelpRequest);
             // 
-            // btnPrintFiles
+            // btnMoveFiles
             // 
-            this.btnPrintFiles.Location = new System.Drawing.Point(360, 171);
-            this.btnPrintFiles.Name = "btnPrintFiles";
-            this.btnPrintFiles.Size = new System.Drawing.Size(177, 69);
-            this.btnPrintFiles.TabIndex = 4;
-            this.btnPrintFiles.Text = "Move files";
-            this.btnPrintFiles.UseVisualStyleBackColor = true;
-            this.btnPrintFiles.Click += new System.EventHandler(this.btnPrintFiles_Click);
+            this.btnMoveFiles.BackColor = System.Drawing.Color.Aquamarine;
+            this.btnMoveFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.btnMoveFiles.Location = new System.Drawing.Point(458, 147);
+            this.btnMoveFiles.Name = "btnMoveFiles";
+            this.btnMoveFiles.Size = new System.Drawing.Size(177, 69);
+            this.btnMoveFiles.TabIndex = 4;
+            this.btnMoveFiles.Text = "Move files";
+            this.btnMoveFiles.UseVisualStyleBackColor = false;
+            this.btnMoveFiles.Click += new System.EventHandler(this.btnMoveFiles_Click);
             // 
             // chkboxMoveAllDublicates
             // 
             this.chkboxMoveAllDublicates.AutoSize = true;
-            this.chkboxMoveAllDublicates.Location = new System.Drawing.Point(626, 29);
+            this.chkboxMoveAllDublicates.Location = new System.Drawing.Point(721, 29);
             this.chkboxMoveAllDublicates.Name = "chkboxMoveAllDublicates";
             this.chkboxMoveAllDublicates.Size = new System.Drawing.Size(321, 20);
             this.chkboxMoveAllDublicates.TabIndex = 5;
@@ -110,7 +116,7 @@
             // Debug_mode
             // 
             this.Debug_mode.AutoSize = true;
-            this.Debug_mode.Location = new System.Drawing.Point(626, 55);
+            this.Debug_mode.Location = new System.Drawing.Point(721, 55);
             this.Debug_mode.Name = "Debug_mode";
             this.Debug_mode.Size = new System.Drawing.Size(108, 20);
             this.Debug_mode.TabIndex = 6;
@@ -122,20 +128,11 @@
             // 
             this.ProgrammName.AutoSize = true;
             this.ProgrammName.Font = new System.Drawing.Font("Times New Roman", 15F);
-            this.ProgrammName.Location = new System.Drawing.Point(330, 20);
+            this.ProgrammName.Location = new System.Drawing.Point(425, 20);
             this.ProgrammName.Name = "ProgrammName";
             this.ProgrammName.Size = new System.Drawing.Size(223, 29);
             this.ProgrammName.TabIndex = 7;
             this.ProgrammName.Text = "Search for dublicates";
-            // 
-            // debugText
-            // 
-            this.debugText.AutoSize = true;
-            this.debugText.Location = new System.Drawing.Point(598, 128);
-            this.debugText.Name = "debugText";
-            this.debugText.Size = new System.Drawing.Size(14, 16);
-            this.debugText.TabIndex = 8;
-            this.debugText.Text = "_";
             // 
             // DublicatesPath
             // 
@@ -143,7 +140,7 @@
             this.DublicatesPath.Name = "DublicatesPath";
             this.DublicatesPath.Size = new System.Drawing.Size(116, 45);
             this.DublicatesPath.TabIndex = 10;
-            this.DublicatesPath.Text = "folder where to put dublicates";
+            this.DublicatesPath.Text = "Select folder for dublicates";
             this.DublicatesPath.UseVisualStyleBackColor = true;
             this.DublicatesPath.Click += new System.EventHandler(this.DublicatesPath_Click);
             // 
@@ -152,28 +149,76 @@
             this.LabelDublicatesPath.AutoSize = true;
             this.LabelDublicatesPath.Location = new System.Drawing.Point(52, 369);
             this.LabelDublicatesPath.Name = "LabelDublicatesPath";
-            this.LabelDublicatesPath.Size = new System.Drawing.Size(98, 16);
+            this.LabelDublicatesPath.Size = new System.Drawing.Size(160, 16);
             this.LabelDublicatesPath.TabIndex = 11;
-            this.LabelDublicatesPath.Text = "dublicates path";
+            this.LabelDublicatesPath.Text = "Select path for dublicates!";
+            // 
+            // debugText
+            // 
+            this.debugText.Location = new System.Drawing.Point(712, 102);
+            this.debugText.Multiline = true;
+            this.debugText.Name = "debugText";
+            this.debugText.ReadOnly = true;
+            this.debugText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.debugText.Size = new System.Drawing.Size(970, 566);
+            this.debugText.TabIndex = 12;
+            this.debugText.Text = resources.GetString("debugText.Text");
+            this.debugText.WordWrap = false;
+            // 
+            // btnClearPath1
+            // 
+            this.btnClearPath1.Location = new System.Drawing.Point(226, 29);
+            this.btnClearPath1.Name = "btnClearPath1";
+            this.btnClearPath1.Size = new System.Drawing.Size(116, 45);
+            this.btnClearPath1.TabIndex = 13;
+            this.btnClearPath1.Text = "Clear path 1";
+            this.btnClearPath1.UseVisualStyleBackColor = true;
+            this.btnClearPath1.Click += new System.EventHandler(this.btnClearPath1_Click);
+            // 
+            // btnClearPath2
+            // 
+            this.btnClearPath2.Location = new System.Drawing.Point(226, 171);
+            this.btnClearPath2.Name = "btnClearPath2";
+            this.btnClearPath2.Size = new System.Drawing.Size(116, 45);
+            this.btnClearPath2.TabIndex = 14;
+            this.btnClearPath2.Text = "Clear path 2";
+            this.btnClearPath2.UseVisualStyleBackColor = true;
+            this.btnClearPath2.Click += new System.EventHandler(this.btnClearPath2_Click);
+            // 
+            // Version
+            // 
+            this.Version.AutoSize = true;
+            this.Version.Location = new System.Drawing.Point(12, 623);
+            this.Version.Name = "Version";
+            this.Version.Size = new System.Drawing.Size(72, 48);
+            this.Version.TabIndex = 15;
+            this.Version.Text = "V 1.0.0\r\n09.10.2024\r\nby Vipaloo";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(970, 491);
+            this.AutoSize = true;
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(1694, 680);
+            this.Controls.Add(this.Version);
+            this.Controls.Add(this.btnClearPath2);
+            this.Controls.Add(this.btnClearPath1);
+            this.Controls.Add(this.debugText);
             this.Controls.Add(this.LabelDublicatesPath);
             this.Controls.Add(this.DublicatesPath);
-            this.Controls.Add(this.debugText);
             this.Controls.Add(this.ProgrammName);
             this.Controls.Add(this.Debug_mode);
             this.Controls.Add(this.chkboxMoveAllDublicates);
-            this.Controls.Add(this.btnPrintFiles);
+            this.Controls.Add(this.btnMoveFiles);
             this.Controls.Add(this.labelPath2);
             this.Controls.Add(this.btnFolder2);
             this.Controls.Add(this.labelPath1);
             this.Controls.Add(this.btnFolder1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds;
+            this.Text = "Dublicate Finder";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -186,13 +231,16 @@
         private System.Windows.Forms.Label labelPath2;
         private System.Windows.Forms.Button btnFolder2;
         private System.Windows.Forms.FolderBrowserDialog SelectFolder1;
-        private System.Windows.Forms.Button btnPrintFiles;
+        private System.Windows.Forms.Button btnMoveFiles;
         private System.Windows.Forms.CheckBox chkboxMoveAllDublicates;
         private System.Windows.Forms.CheckBox Debug_mode;
         private System.Windows.Forms.Label ProgrammName;
-        private System.Windows.Forms.Label debugText;
         private System.Windows.Forms.Button DublicatesPath;
         private System.Windows.Forms.Label LabelDublicatesPath;
+        private System.Windows.Forms.TextBox debugText;
+        private System.Windows.Forms.Button btnClearPath1;
+        private System.Windows.Forms.Button btnClearPath2;
+        private System.Windows.Forms.Label Version;
     }
 }
 

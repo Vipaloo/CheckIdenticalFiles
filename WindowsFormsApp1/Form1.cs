@@ -59,7 +59,7 @@ namespace WindowsFormsApp1
 
         // Event handler for button click to process the files and find identical ones
         // Main function
-        private async void btnPrintFiles_Click(object sender, EventArgs e)
+        private async void btnMoveFiles_Click(object sender, EventArgs e)
         {
             if (path1 == "" && path2 == "")
             {
@@ -90,13 +90,15 @@ namespace WindowsFormsApp1
                     return;
                 }
             }
-            // Update the debug text immediately
-            debugText.Text = "Working on it...";
-
+            if(path1 == path2)
+            {
+                path2 = "";
+            }
             // Clear previous data
             allFilesPaths.Clear();
             allHashes.Clear();
             identicalFiles.Clear();
+            debugText.Text = "";
 
             // Run file processing in a background task
             await Task.Run(() =>
@@ -112,7 +114,10 @@ namespace WindowsFormsApp1
                 }
                 // Compare all hashes and group identical files
                 CompareAndGroupHashes();
-
+                this.Invoke(new Action(() =>
+                {
+                    debugText.Text += "-----------------------------------------------------\r\n";
+                }));
                 // Display the results in the console
                 Console.WriteLine("Groups of identical files:");
                 if (chkboxMoveAllDublicates.Checked)
@@ -125,12 +130,20 @@ namespace WindowsFormsApp1
                             Console.WriteLine(file);
                             if (Debug_mode.Checked)
                             {
-                                debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                                this.Invoke(new Action(() =>
+                                {
+                                    debugText.Text += file + " will be moved to --> " + dublicatesPath + "\r\n";
+                                }));
+
                             }
                             else
                             {
                                 MoveIdenticalFiles(file);
-                                debugText.Text = "Done!";
+                                this.Invoke(new Action(() =>
+                                {
+                                    debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
+                                }));
+
                             }
                         }
                         Console.WriteLine();
@@ -149,7 +162,7 @@ namespace WindowsFormsApp1
                                 {
                                     if (file != group[0])
                                     {
-                                        debugText.Text += file + " will be moved to --> " + dublicatesPath + "\n";
+                                        debugText.Text += file + " will be moved to --> " + dublicatesPath + "\r\n";
                                     }
                                 }));
                             }
@@ -162,13 +175,14 @@ namespace WindowsFormsApp1
                                 MoveIdenticalFiles(file);
                                 this.Invoke(new Action(() =>
                                 {
-                                    debugText.Text = "Done!";
+                                    debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
                                 }));
                             }
                         }
                     }
                 }
             });
+            btnMoveFiles.Enabled = true;
         }
 
         // DFS method to recursively get files in directories and subdirectories
@@ -176,6 +190,11 @@ namespace WindowsFormsApp1
         {
             try
             {
+                // Disable button so it couldn't be pressed again while app is working on files
+                this.Invoke(new Action(() =>
+                {
+                    btnMoveFiles.Enabled = false;
+                }));
                 // Get all files in the current directory
                 string[] files = Directory.GetFiles(directory);
 
@@ -183,6 +202,10 @@ namespace WindowsFormsApp1
                 foreach (string file in files)
                 {
                     Console.WriteLine(file);
+                    this.Invoke(new Action(() =>
+                    {
+                        debugText.Text += "Working on " + file + "\r\n";
+                    }));
                     allFilesPaths.Add(file); // Add file path to the list
 
                     using (var md5 = MD5.Create())
@@ -316,6 +339,18 @@ namespace WindowsFormsApp1
                     dublicatesPath = folderBrowserDialog.SelectedPath;
                 }
             }
+        }
+
+        private void btnClearPath1_Click(object sender, EventArgs e)
+        {
+            path1 = "";
+            labelPath1.Text = "Select 1st folder!";
+        }
+
+        private void btnClearPath2_Click(object sender, EventArgs e)
+        {
+            path2 = "";
+            labelPath2.Text = "Select 2nd folder!";
         }
     }
 }
