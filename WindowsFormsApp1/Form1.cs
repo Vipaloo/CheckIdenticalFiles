@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using System.ComponentModel;
 
 namespace WindowsFormsApp1
 {
@@ -17,6 +19,8 @@ namespace WindowsFormsApp1
         List<string> allFilesPaths = new List<string>();  // List to hold all file paths
         List<byte[]> allHashes = new List<byte[]>(); // List to hold all byte[] hashes
         List<List<string>> identicalFiles = new List<List<string>>(); // List to hold groups of similar files
+        private static double totalFilesSize = 0;
+        private static double alreadyGoneThroughSize = 0;
 
         public Form1()
         {
@@ -99,12 +103,44 @@ namespace WindowsFormsApp1
             allHashes.Clear();
             identicalFiles.Clear();
             debugText.Text = "";
+            totalFilesSize = 0;
+            alreadyGoneThroughSize = 0;
 
             // Run file processing in a background task
             await Task.Run(() =>
             {
+                double fileSizePath1 = 0;
+                double fileSizePath2 = 0;
+                // Get all files size
+                if (path1 != "")
+                {
+                    fileSizePath1 = GetTotalFilesSizeOnDisk(path1, this);
+                }
+                if (path2 != "")
+                {
+                    fileSizePath2 = GetTotalFilesSizeOnDisk(path2, this);
+                }
+                if (path1 != "" && path2 != "")
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        // TODO: remake it with normal variable name and logic
+                        labelFileSizes.Text = "0.00 MB/" + fileSizePath2.ToString("F2") + " MB";
+                    }));
+                    totalFilesSize = fileSizePath2;
+                }
+                else
+                {
+                    // calculate file size if just one folder was selected
+                    double allFileSizeMB = fileSizePath1 + fileSizePath2;
+                    this.Invoke(new Action(() =>
+                    {
+                        labelFileSizes.Text = "0.00 MB/" + allFileSizeMB.ToString("F2") + " MB";
+                    }));
+                    totalFilesSize = allFileSizeMB;
+                }
                 // Call the recursive DFS function starting from path1 and path2
-                if(path1 != "")
+                if (path1 != "")
                 {
                     GetFilesDFS(path1);
                 }
@@ -112,14 +148,18 @@ namespace WindowsFormsApp1
                 {
                     GetFilesDFS(path2);
                 }
+
                 // Compare all hashes and group identical files
                 CompareAndGroupHashes();
+
                 this.Invoke(new Action(() =>
                 {
                     debugText.Text += "-----------------------------------------------------\r\n";
                 }));
                 // Display the results in the console
                 Console.WriteLine("Groups of identical files:");
+
+                // Moving/printing in debugText files
                 if (chkboxMoveAllDublicates.Checked)
                 {
                     foreach (var group in identicalFiles)
@@ -149,12 +189,15 @@ namespace WindowsFormsApp1
                         Console.WriteLine();
                     }
                 }
+                // Moving/printing in debugText files(checkbox chkboxMoveAllDublicates uncheked /default)
                 else
                 {
                     foreach (var group in identicalFiles)
                     {
+                        Console.WriteLine("Identical files:");
                         foreach (var file in group)
                         {
+                            Console.WriteLine(file);
                             if (Debug_mode.Checked)
                             {
                                 // Safely update debugText using Invoke to marshal the call to the UI thread
@@ -168,6 +211,7 @@ namespace WindowsFormsApp1
                             }
                             else
                             {
+                                // skip first element
                                 if (file == group[0])
                                 {
                                     continue;
@@ -185,11 +229,45 @@ namespace WindowsFormsApp1
             btnMoveFiles.Enabled = true;
         }
 
-        // DFS method to recursively get files in directories and subdirectories
+        // Calculate the total size on disk for all files in a directory
+        static double GetTotalFilesSizeOnDisk(string directory, Form1 form)
+        {
+            string[] files = Directory.GetFiles(directory);
+
+            foreach (string file in files)
+            {
+                long fileSizeOnDisk = new FileInfo(file).Length;
+
+                // Add the file size on disk to the total
+                totalFilesSize += fileSizeOnDisk;
+            }
+
+            // Get all subdirectories in the current directory
+            string[] subDirectories = Directory.GetDirectories(directory);
+
+            // Recursively call this method for each subdirectory
+            foreach (string subDir in subDirectories)
+            {
+                GetTotalFilesSizeOnDisk(subDir, form);
+            }
+            // DEBUG
+            Console.WriteLine($"Total size on disk: {totalFilesSize} bytes");
+
+            // Convert from bytes to MB
+            double totalSizeInMB = totalFilesSize / (1024.0 * 1024.0);
+            Console.WriteLine($"Total size on disk: {totalSizeInMB:F2} MB");
+
+            return (double)totalSizeInMB;
+        }
+
+
+
+        // Depth First Search(DFS) method to recursively get files in directories and subdirectories
         private void GetFilesDFS(string directory)
         {
             try
             {
+                // TODO: put disabling button in the function above since it is called first
                 // Disable button so it couldn't be pressed again while app is working on files
                 this.Invoke(new Action(() =>
                 {
@@ -207,7 +285,8 @@ namespace WindowsFormsApp1
                         debugText.Text += "Working on " + file + "\r\n";
                     }));
                     allFilesPaths.Add(file); // Add file path to the list
-
+                    double currentFileSize = new FileInfo(file).Length; // Size of file programm is currently working on
+                    currentFileSize = currentFileSize / (1024.0 * 1024.0); // convert to MB
                     using (var md5 = MD5.Create())
                     {
                         using (var fileStream = File.OpenRead(file))
@@ -216,8 +295,13 @@ namespace WindowsFormsApp1
                             allHashes.Add(hashBytes); // Add the byte[] array to the list
                         }
                     }
+                    this.Invoke(new Action(() =>
+                    {
+                        // update label, formula : goneThrough(MB) / totalSize(MB)
+                        alreadyGoneThroughSize += currentFileSize;
+                        labelFileSizes.Text = alreadyGoneThroughSize.ToString("F2") + " MB/" + totalFilesSize.ToString("F2") + " MB";
+                    }));
                 }
-
                 // Get all subdirectories in the current directory
                 string[] subDirectories = Directory.GetDirectories(directory);
 

@@ -44,6 +44,7 @@
             this.btnClearPath1 = new System.Windows.Forms.Button();
             this.btnClearPath2 = new System.Windows.Forms.Button();
             this.Version = new System.Windows.Forms.Label();
+            this.labelFileSizes = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnFolder1
@@ -192,7 +193,16 @@
             this.Version.Name = "Version";
             this.Version.Size = new System.Drawing.Size(72, 48);
             this.Version.TabIndex = 15;
-            this.Version.Text = "V 1.0.0\r\n09.10.2024\r\nby Vipaloo";
+            this.Version.Text = "V 1.1.0\r\n18.10.2024\r\nby Vipaloo";
+            // 
+            // labelFileSizes
+            // 
+            this.labelFileSizes.AutoSize = true;
+            this.labelFileSizes.Location = new System.Drawing.Point(427, 313);
+            this.labelFileSizes.Name = "labelFileSizes";
+            this.labelFileSizes.Size = new System.Drawing.Size(221, 16);
+            this.labelFileSizes.TabIndex = 16;
+            this.labelFileSizes.Text = "Here will be displayed all files sizes!";
             // 
             // Form1
             // 
@@ -201,6 +211,7 @@
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1694, 680);
+            this.Controls.Add(this.labelFileSizes);
             this.Controls.Add(this.Version);
             this.Controls.Add(this.btnClearPath2);
             this.Controls.Add(this.btnClearPath1);
@@ -241,6 +252,7 @@
         private System.Windows.Forms.Button btnClearPath1;
         private System.Windows.Forms.Button btnClearPath2;
         private System.Windows.Forms.Label Version;
+        private System.Windows.Forms.Label labelFileSizes;
     }
 }
 
