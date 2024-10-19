@@ -13,6 +13,8 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
+        private CancellationTokenSource cancellationTokenSource;
+
         String path1 = "";
         String path2 = "";
         String dublicatesPath = "";
@@ -65,6 +67,9 @@ namespace WindowsFormsApp1
         // Main function
         private async void btnMoveFiles_Click(object sender, EventArgs e)
         {
+            cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancellationTokenSource.Token;
+
             if (path1 == "" && path2 == "")
             {
                 // If no folder selected 
@@ -105,137 +110,163 @@ namespace WindowsFormsApp1
             debugText.Text = "";
             totalFilesSize = 0;
             alreadyGoneThroughSize = 0;
+            buttonStopProcessing.Enabled = true;
+
+
+            labelFileSizes.Text = "Working on it...";
 
             // Run file processing in a background task
             await Task.Run(() =>
             {
-                double fileSizePath1 = 0;
-                double fileSizePath2 = 0;
-                // Get all files size
-                if (path1 != "")
+                try
                 {
-                    fileSizePath1 = GetTotalFilesSizeOnDisk(path1, this);
-                }
-                if (path2 != "")
-                {
-                    fileSizePath2 = GetTotalFilesSizeOnDisk(path2, this);
-                }
-                if (path1 != "" && path2 != "")
-                {
-                    this.Invoke(new Action(() =>
+                    double fileSizePath1 = 0;
+                    double fileSizePath2 = 0;
+                    // Get all files size
+                    if (path1 != "")
                     {
-                        // TODO: remake it with normal variable name and logic
-                        labelFileSizes.Text = "0.00 MB/" + fileSizePath2.ToString("F2") + " MB";
-                    }));
-                    totalFilesSize = fileSizePath2;
-                }
-                else
-                {
-                    // calculate file size if just one folder was selected
-                    double allFileSizeMB = fileSizePath1 + fileSizePath2;
-                    this.Invoke(new Action(() =>
-                    {
-                        labelFileSizes.Text = "0.00 MB/" + allFileSizeMB.ToString("F2") + " MB";
-                    }));
-                    totalFilesSize = allFileSizeMB;
-                }
-                // Call the recursive DFS function starting from path1 and path2
-                if (path1 != "")
-                {
-                    GetFilesDFS(path1);
-                }
-                if(path2 != "")
-                {
-                    GetFilesDFS(path2);
-                }
-
-                // Compare all hashes and group identical files
-                CompareAndGroupHashes();
-
-                this.Invoke(new Action(() =>
-                {
-                    debugText.Text += "-----------------------------------------------------\r\n";
-                }));
-                // Display the results in the console
-                Console.WriteLine("Groups of identical files:");
-
-                // Moving/printing in debugText files
-                if (chkboxMoveAllDublicates.Checked)
-                {
-                    foreach (var group in identicalFiles)
-                    {
-                        Console.WriteLine("Identical files:");
-                        foreach (var file in group)
-                        {
-                            Console.WriteLine(file);
-                            if (Debug_mode.Checked)
-                            {
-                                this.Invoke(new Action(() =>
-                                {
-                                    debugText.Text += file + " will be moved to --> " + dublicatesPath + "\r\n";
-                                }));
-
-                            }
-                            else
-                            {
-                                MoveIdenticalFiles(file);
-                                this.Invoke(new Action(() =>
-                                {
-                                    debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
-                                }));
-
-                            }
-                        }
-                        Console.WriteLine();
+                        fileSizePath1 = GetTotalFilesSizeOnDisk(path1, this, token);
                     }
-                }
-                // Moving/printing in debugText files(checkbox chkboxMoveAllDublicates uncheked /default)
-                else
-                {
-                    foreach (var group in identicalFiles)
+                    if (path2 != "")
                     {
-                        Console.WriteLine("Identical files:");
-                        foreach (var file in group)
+                        fileSizePath2 = GetTotalFilesSizeOnDisk(path2, this, token);
+                    }
+                    if (path1 != "" && path2 != "")
+                    {
+                        this.Invoke(new Action(() =>
                         {
-                            Console.WriteLine(file);
-                            if (Debug_mode.Checked)
+                            // TODO: remake it with normal variable name and logic
+                            labelFileSizes.Text = "0.00 MB/" + fileSizePath2.ToString("F2") + " MB";
+                        }));
+                        totalFilesSize = fileSizePath2;
+                    }
+                    else
+                    {
+                        // calculate file size if just one folder was selected
+                        double allFileSizeMB = fileSizePath1 + fileSizePath2;
+                        this.Invoke(new Action(() =>
+                        {
+                            labelFileSizes.Text = "0.00 MB/" + allFileSizeMB.ToString("F2") + " MB";
+                        }));
+                        totalFilesSize = allFileSizeMB;
+                    }
+                    // Call the recursive DFS function starting from path1 and path2
+                    if (path1 != "")
+                    {
+                        GetFilesDFS(path1, token);
+                    }
+                    if (path2 != "")
+                    {
+                        GetFilesDFS(path2, token);
+                    }
+
+                    // Compare all hashes and group identical files
+                    CompareAndGroupHashes();
+
+                    this.Invoke(new Action(() =>
+                    {
+                        debugText.Text += "-----------------------------------------------------\r\n";
+                    }));
+                    // Display the results in the console
+                    Console.WriteLine("Groups of identical files:");
+
+                    // Moving/printing in debugText files
+                    if (chkboxMoveAllDublicates.Checked)
+                    {
+                        foreach (var group in identicalFiles)
+                        {
+                            Console.WriteLine("Identical files:");
+                            foreach (var file in group)
                             {
-                                // Safely update debugText using Invoke to marshal the call to the UI thread
-                                this.Invoke(new Action(() =>
+                                Console.WriteLine(file);
+                                if (Debug_mode.Checked)
                                 {
-                                    if (file != group[0])
+                                    this.Invoke(new Action(() =>
                                     {
                                         debugText.Text += file + " will be moved to --> " + dublicatesPath + "\r\n";
-                                    }
-                                }));
-                            }
-                            else
-                            {
-                                // skip first element
-                                if (file == group[0])
-                                {
-                                    continue;
+                                    }));
+
                                 }
-                                MoveIdenticalFiles(file);
-                                this.Invoke(new Action(() =>
+                                else
                                 {
-                                    debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
-                                }));
+                                    MoveIdenticalFiles(file);
+                                    this.Invoke(new Action(() =>
+                                    {
+                                        debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
+                                    }));
+
+                                }
+                            }
+                            Console.WriteLine();
+                        }
+                    }
+                    // Moving/printing in debugText files(checkbox chkboxMoveAllDublicates uncheked /default)
+                    else
+                    {
+                        foreach (var group in identicalFiles)
+                        {
+                            Console.WriteLine("Identical files:");
+                            foreach (var file in group)
+                            {
+                                Console.WriteLine(file);
+                                if (Debug_mode.Checked)
+                                {
+                                    // Safely update debugText using Invoke to marshal the call to the UI thread
+                                    this.Invoke(new Action(() =>
+                                    {
+                                        if (file != group[0])
+                                        {
+                                            debugText.Text += file + " will be moved to --> " + dublicatesPath + "\r\n";
+                                        }
+                                    }));
+                                }
+                                else
+                                {
+                                    // skip first element
+                                    if (file == group[0])
+                                    {
+                                        continue;
+                                    }
+                                    MoveIdenticalFiles(file);
+                                    this.Invoke(new Action(() =>
+                                    {
+                                        debugText.Text += file + " was moved to --> " + dublicatesPath + "\r\n";
+                                    }));
+                                }
                             }
                         }
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        debugText.Text += "Operation canceled.\r\n";
+                    }));
+                }
+                finally
+                {
+                    // Re-enable the move button after completion or cancellation
+                    this.Invoke(new Action(() =>
+                    {
+                        btnMoveFiles.Enabled = true;
+                        buttonStopProcessing.Enabled = false;
+                    }));
+                }
             });
-            btnMoveFiles.Enabled = true;
         }
 
         // Calculate the total size on disk for all files in a directory
-        static double GetTotalFilesSizeOnDisk(string directory, Form1 form)
+        static double GetTotalFilesSizeOnDisk(string directory, Form1 form, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested(); // Check for cancellation
+
             string[] files = Directory.GetFiles(directory);
 
             foreach (string file in files)
             {
+                token.ThrowIfCancellationRequested(); // Check for cancellation
+
                 long fileSizeOnDisk = new FileInfo(file).Length;
 
                 // Add the file size on disk to the total
@@ -248,7 +279,7 @@ namespace WindowsFormsApp1
             // Recursively call this method for each subdirectory
             foreach (string subDir in subDirectories)
             {
-                GetTotalFilesSizeOnDisk(subDir, form);
+                GetTotalFilesSizeOnDisk(subDir, form, token);
             }
             // DEBUG
             Console.WriteLine($"Total size on disk: {totalFilesSize} bytes");
@@ -263,8 +294,9 @@ namespace WindowsFormsApp1
 
 
         // Depth First Search(DFS) method to recursively get files in directories and subdirectories
-        private void GetFilesDFS(string directory)
+        private void GetFilesDFS(string directory, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested(); // Check for cancellation
             try
             {
                 // TODO: put disabling button in the function above since it is called first
@@ -284,6 +316,7 @@ namespace WindowsFormsApp1
                     {
                         debugText.Text += "Working on " + file + "\r\n";
                     }));
+                    token.ThrowIfCancellationRequested(); // Check for cancellation
                     allFilesPaths.Add(file); // Add file path to the list
                     double currentFileSize = new FileInfo(file).Length; // Size of file programm is currently working on
                     currentFileSize = currentFileSize / (1024.0 * 1024.0); // convert to MB
@@ -308,8 +341,12 @@ namespace WindowsFormsApp1
                 // Recursively call this method for each subdirectory
                 foreach (string subDir in subDirectories)
                 {
-                    GetFilesDFS(subDir);
+                    GetFilesDFS(subDir, token);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                throw; // Propagate cancellation exception
             }
             catch (UnauthorizedAccessException)
             {
@@ -435,6 +472,14 @@ namespace WindowsFormsApp1
         {
             path2 = "";
             labelPath2.Text = "Select 2nd folder!";
+        }
+
+        private void buttonStopProcessing_Click(object sender, EventArgs e)
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel(); // Trigger the cancellation
+            }
         }
     }
 }

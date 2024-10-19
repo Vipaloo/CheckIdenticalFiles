@@ -45,6 +45,7 @@
             this.btnClearPath2 = new System.Windows.Forms.Button();
             this.Version = new System.Windows.Forms.Label();
             this.labelFileSizes = new System.Windows.Forms.Label();
+            this.buttonStopProcessing = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnFolder1
@@ -193,7 +194,7 @@
             this.Version.Name = "Version";
             this.Version.Size = new System.Drawing.Size(72, 48);
             this.Version.TabIndex = 15;
-            this.Version.Text = "V 1.1.0\r\n18.10.2024\r\nby Vipaloo";
+            this.Version.Text = "V 1.1.1\r\n19.10.2024\r\nby Vipaloo";
             // 
             // labelFileSizes
             // 
@@ -204,6 +205,18 @@
             this.labelFileSizes.TabIndex = 16;
             this.labelFileSizes.Text = "Here will be displayed all files sizes!";
             // 
+            // buttonStopProcessing
+            // 
+            this.buttonStopProcessing.BackColor = System.Drawing.Color.Red;
+            this.buttonStopProcessing.Enabled = false;
+            this.buttonStopProcessing.Location = new System.Drawing.Point(496, 242);
+            this.buttonStopProcessing.Name = "buttonStopProcessing";
+            this.buttonStopProcessing.Size = new System.Drawing.Size(99, 47);
+            this.buttonStopProcessing.TabIndex = 17;
+            this.buttonStopProcessing.Text = "Stop processing";
+            this.buttonStopProcessing.UseVisualStyleBackColor = false;
+            this.buttonStopProcessing.Click += new System.EventHandler(this.buttonStopProcessing_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -211,6 +224,7 @@
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1694, 680);
+            this.Controls.Add(this.buttonStopProcessing);
             this.Controls.Add(this.labelFileSizes);
             this.Controls.Add(this.Version);
             this.Controls.Add(this.btnClearPath2);
@@ -253,6 +267,7 @@
         private System.Windows.Forms.Button btnClearPath2;
         private System.Windows.Forms.Label Version;
         private System.Windows.Forms.Label labelFileSizes;
+        private System.Windows.Forms.Button buttonStopProcessing;
     }
 }
 
