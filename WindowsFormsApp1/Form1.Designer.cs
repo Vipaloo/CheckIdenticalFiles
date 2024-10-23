@@ -46,6 +46,10 @@
             this.Version = new System.Windows.Forms.Label();
             this.labelFileSizes = new System.Windows.Forms.Label();
             this.buttonStopProcessing = new System.Windows.Forms.Button();
+            this.labelCheckOnly = new System.Windows.Forms.Label();
+            this.labelIgnore = new System.Windows.Forms.Label();
+            this.textBoxCheckOnlyExtensions = new System.Windows.Forms.TextBox();
+            this.textBoxIgnoreExtensions = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnFolder1
@@ -194,7 +198,7 @@
             this.Version.Name = "Version";
             this.Version.Size = new System.Drawing.Size(72, 48);
             this.Version.TabIndex = 15;
-            this.Version.Text = "V 1.1.1\r\n19.10.2024\r\nby Vipaloo";
+            this.Version.Text = "V 1.2.0\r\n23.10.2024\r\nby Vipaloo";
             // 
             // labelFileSizes
             // 
@@ -217,6 +221,40 @@
             this.buttonStopProcessing.UseVisualStyleBackColor = false;
             this.buttonStopProcessing.Click += new System.EventHandler(this.buttonStopProcessing_Click);
             // 
+            // labelCheckOnly
+            // 
+            this.labelCheckOnly.AutoSize = true;
+            this.labelCheckOnly.Location = new System.Drawing.Point(110, 427);
+            this.labelCheckOnly.Name = "labelCheckOnly";
+            this.labelCheckOnly.Size = new System.Drawing.Size(76, 16);
+            this.labelCheckOnly.TabIndex = 18;
+            this.labelCheckOnly.Text = "Check only:";
+            // 
+            // labelIgnore
+            // 
+            this.labelIgnore.AutoSize = true;
+            this.labelIgnore.Location = new System.Drawing.Point(274, 427);
+            this.labelIgnore.Name = "labelIgnore";
+            this.labelIgnore.Size = new System.Drawing.Size(48, 16);
+            this.labelIgnore.TabIndex = 19;
+            this.labelIgnore.Text = "Ignore:";
+            // 
+            // textBoxCheckOnlyExtensions
+            // 
+            this.textBoxCheckOnlyExtensions.Location = new System.Drawing.Point(113, 460);
+            this.textBoxCheckOnlyExtensions.Multiline = true;
+            this.textBoxCheckOnlyExtensions.Name = "textBoxCheckOnlyExtensions";
+            this.textBoxCheckOnlyExtensions.Size = new System.Drawing.Size(73, 198);
+            this.textBoxCheckOnlyExtensions.TabIndex = 20;
+            // 
+            // textBoxIgnoreExtensions
+            // 
+            this.textBoxIgnoreExtensions.Location = new System.Drawing.Point(277, 460);
+            this.textBoxIgnoreExtensions.Multiline = true;
+            this.textBoxIgnoreExtensions.Name = "textBoxIgnoreExtensions";
+            this.textBoxIgnoreExtensions.Size = new System.Drawing.Size(73, 198);
+            this.textBoxIgnoreExtensions.TabIndex = 21;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -224,6 +262,10 @@
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1694, 680);
+            this.Controls.Add(this.textBoxIgnoreExtensions);
+            this.Controls.Add(this.textBoxCheckOnlyExtensions);
+            this.Controls.Add(this.labelIgnore);
+            this.Controls.Add(this.labelCheckOnly);
             this.Controls.Add(this.buttonStopProcessing);
             this.Controls.Add(this.labelFileSizes);
             this.Controls.Add(this.Version);
@@ -268,6 +310,10 @@
         private System.Windows.Forms.Label Version;
         private System.Windows.Forms.Label labelFileSizes;
         private System.Windows.Forms.Button buttonStopProcessing;
+        private System.Windows.Forms.Label labelCheckOnly;
+        private System.Windows.Forms.Label labelIgnore;
+        private System.Windows.Forms.TextBox textBoxCheckOnlyExtensions;
+        private System.Windows.Forms.TextBox textBoxIgnoreExtensions;
     }
 }
 

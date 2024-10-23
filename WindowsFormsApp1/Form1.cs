@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace WindowsFormsApp1
 {
@@ -21,6 +22,8 @@ namespace WindowsFormsApp1
         List<string> allFilesPaths = new List<string>();  // List to hold all file paths
         List<byte[]> allHashes = new List<byte[]>(); // List to hold all byte[] hashes
         List<List<string>> identicalFiles = new List<List<string>>(); // List to hold groups of similar files
+        List<string> checkOnlyExtensions = new List<string>(); // List of file extensions that will only be processed
+        List<string> ignoreExtensions = new List<string>(); // List of file extensions that will be ignored
         private static double totalFilesSize = 0;
         private static double alreadyGoneThroughSize = 0;
 
@@ -111,6 +114,8 @@ namespace WindowsFormsApp1
             totalFilesSize = 0;
             alreadyGoneThroughSize = 0;
             buttonStopProcessing.Enabled = true;
+            checkOnlyExtensions.Clear();
+            ignoreExtensions.Clear();
 
 
             labelFileSizes.Text = "Working on it...";
@@ -118,8 +123,12 @@ namespace WindowsFormsApp1
             // Run file processing in a background task
             await Task.Run(() =>
             {
+
                 try
                 {
+
+                    SortElementsByRegexCheckOnlyOrIgnore();
+
                     double fileSizePath1 = 0;
                     double fileSizePath2 = 0;
                     // Get all files size
@@ -256,12 +265,80 @@ namespace WindowsFormsApp1
             });
         }
 
+        private void SortElementsByRegexCheckOnlyOrIgnore()
+        {
+            var regex = @"^\.\w+$"; // Check only for ".anything"
+            int i = 0;
+            while (i < textBoxCheckOnlyExtensions.Lines.Length && textBoxCheckOnlyExtensions.Lines[i] != "")
+            {
+                checkOnlyExtensions.Add(textBoxCheckOnlyExtensions.Lines[i]);
+                i++;
+            }
+            i = 0;
+            while (i < textBoxIgnoreExtensions.Lines.Length && textBoxIgnoreExtensions.Lines[i] != "")
+            {
+                ignoreExtensions.Add(textBoxIgnoreExtensions.Lines[i]);
+                i++;
+            }
+            for (i = checkOnlyExtensions.Count - 1; i >= 0; i--)  // Iterate backwards for safe removal
+            {
+                var element = checkOnlyExtensions[i];
+                var match = Regex.Match(element, regex, RegexOptions.IgnoreCase);
+
+                if (!match.Success)
+                {
+                    checkOnlyExtensions.RemoveAt(i);
+                }
+            }
+            for (i = ignoreExtensions.Count - 1; i >= 0; i--)  // Iterate backwards for safe removal
+            {
+                var element = ignoreExtensions[i];
+                var match = Regex.Match(element, regex, RegexOptions.IgnoreCase);
+
+                if (!match.Success)
+                {
+                    ignoreExtensions.RemoveAt(i);
+                }
+            }
+
+
+            // DEBUG
+            Console.WriteLine("check only:");
+            foreach (var elem in checkOnlyExtensions)
+            {
+                Console.WriteLine(elem);
+            }
+            Console.WriteLine("ignore:");
+            foreach (var elem in ignoreExtensions)
+            {
+                Console.WriteLine(elem);
+            }
+        }
+
         // Calculate the total size on disk for all files in a directory
-        static double GetTotalFilesSizeOnDisk(string directory, Form1 form, CancellationToken token)
+        double GetTotalFilesSizeOnDisk(string directory, Form1 form, CancellationToken token)
         {
             token.ThrowIfCancellationRequested(); // Check for cancellation
 
-            string[] files = Directory.GetFiles(directory);
+            // Disable button so it couldn't be pressed again while app is working on files
+            this.Invoke(new Action(() =>
+            {
+                btnMoveFiles.Enabled = false;
+            }));
+
+            // Escape and join extensions to create a regex pattern
+            // This creates a pattern like: "\.txt$|\.pdf$|\.doc$"
+            var regex = string.Join("|", checkOnlyExtensions.Select(ext => $@"\{ext}$"));
+            // Get all files in the current directory
+            string[] allFiles = Directory.GetFiles(directory);
+            // TODO: ignore files from ignoreExtensions list
+            // Filter out files that have an extension in ignoreExtensions
+
+            var AllFilesNoIgnoredExtensions = allFiles.Where(file =>
+                !ignoreExtensions.Any(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+            ).ToArray();
+
+            var files = AllFilesNoIgnoredExtensions.Where(file => Regex.IsMatch(file, regex, RegexOptions.IgnoreCase)).ToArray();
 
             foreach (string file in files)
             {
@@ -299,14 +376,19 @@ namespace WindowsFormsApp1
             token.ThrowIfCancellationRequested(); // Check for cancellation
             try
             {
-                // TODO: put disabling button in the function above since it is called first
-                // Disable button so it couldn't be pressed again while app is working on files
-                this.Invoke(new Action(() =>
-                {
-                    btnMoveFiles.Enabled = false;
-                }));
+                // Escape and join extensions to create a regex pattern
+                // This creates a pattern like: "\.txt$|\.pdf$|\.doc$"
+                var regex = string.Join("|", checkOnlyExtensions.Select(ext => $@"\{ext}$"));
                 // Get all files in the current directory
-                string[] files = Directory.GetFiles(directory);
+                string[] allFiles = Directory.GetFiles(directory);
+                // TODO: ignore files from ignoreExtensions list
+                // Filter out files that have an extension in ignoreExtensions
+
+                var AllFilesNoIgnoredExtensions = allFiles.Where(file =>
+                    !ignoreExtensions.Any(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                ).ToArray();
+
+                var files = AllFilesNoIgnoredExtensions.Where(file => Regex.IsMatch(file, regex, RegexOptions.IgnoreCase)).ToArray();
 
                 // Process each file
                 foreach (string file in files)
@@ -476,10 +558,15 @@ namespace WindowsFormsApp1
 
         private void buttonStopProcessing_Click(object sender, EventArgs e)
         {
-            if (cancellationTokenSource != null)
+            DialogResult ConfirmationResult = MessageBox.Show($"Are you sure you want to stop file processing?",
+                "Stop processing?",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
+            if (ConfirmationResult == DialogResult.Cancel)
             {
-                cancellationTokenSource.Cancel(); // Trigger the cancellation
+                return;
             }
+            cancellationTokenSource?.Cancel(); // If !null Trigger the cancellation
         }
     }
 }

@@ -130,9 +130,19 @@ This is programm to find identical files in one or two separate folders.
 Please select either one or two folders where to take files from and then folder where to put files, that are dublicates,
 then press "Move files" to move files to your selected destination folder.
 By default programm will save file that it will find first in its original location. File search is by Depth First alghoritm.
+
 "Debug mode" - just outputs here from where and where to files will be moved to, but doesn't actually moves them.
 "Put all files that have dublicates in separate foldes" - will move every file that have dublicates, even that it will find first.
-</value>
+
+OPTIONAL:
+"Check only" - check only files with given extensions(*.jpg, *.txt, etc)
+"Ignore" - ignore files with given extensions
+Write one-per-line extension for check only and ignore text boxes, like:
+.jpg
+.txt
+.py
+
+Don't include anything other than that in text boxes</value>
   </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>81</value>
