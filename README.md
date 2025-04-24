@@ -25,9 +25,9 @@ Duplicate Finder is a Windows Forms application designed to find and manage dupl
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/WindowsFormsApp1.git
+git clone https://github.com/vipaloo/WindowsFormsApp1.git
 ```
-2. Open the solution file `WindowsFormsApp1.sln` in Visual Studio.
+2. Open the solution file in Visual Studio.
 3. Build the solution to restore the necessary packages.
 
 ## Usage
